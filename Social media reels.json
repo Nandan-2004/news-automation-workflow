@@ -1,0 +1,765 @@
+{
+  "name": "Social media reels",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a script of a social media video about the topic included below and title.\n\nThe video will be organized in scenes. Each scene has a voice over and an image.\nThe voice over text must be at least 20 words.\nThere should be not more than 4 scenes, and the final scene MUST function as a clear and engaging outro that wraps up the video smoothly.\nYour response must be in JSON format following this schema:\n{\n\"title\": \"\",\n\"scenes\": [{\n\"voiceOverText\": \"\",\n\"imagePrompt\": \"\"\n}]\n}\nThe image prompt must be written in ENGLISH, being detailed and photo realistic. In the image prompt, you MUST AVOID describing any situation in the image that can be considered inappropriate (violence, disgusting, gore, sex, nudity, NSFW, etc.) as it may be rejected by the AI service.",
+              "role": "system"
+            },
+            {
+              "content": "=Topic: \"{{ $json.Topic }}\".\nTarget language: \"{{ $json.Language }}\"."
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -992,
+        416
+      ],
+      "id": "03abb1d4-eba3-4462-9c40-6b248cb09a83",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "t0Z2Mq4tmqef2XxK",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.movie.status }}",
+                    "rightValue": "done",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "17c132d0-6142-4a07-b132-f28027949bec",
+                    "leftValue": "={{ $json.movie.status }}",
+                    "rightValue": "error",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b6381708-9a0d-4b23-9efc-fdfaccb2cbac",
+                    "leftValue": "={{ $json.movie.status }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        80,
+        352
+      ],
+      "id": "176035e4-85ae-4eba-9738-175fb9be063e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $json.movie.message }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        624,
+        576
+      ],
+      "id": "51ee6dec-4c37-4f98-8788-eafba9696c4e",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "## Wait for the video to be rendered",
+        "height": 328,
+        "width": 700,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -464,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "1fbf6bd1-1bbc-47c0-a33e-4e6ab8a8f095",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "https://api.json2video.com/v2/movies",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "project",
+              "value": "={{ $('Submit a new job').item.json.project }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "Jwl9JSnD9pbRnjViXyB7JZdEYdLxQF1baXVWYfAB "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        368
+      ],
+      "id": "3d382bca-97d4-4308-88b2-36941f2989b5",
+      "name": "Check status"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.json2video.com/v2/movies",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "Jwl9JSnD9pbRnjViXyB7JZdEYdLxQF1baXVWYfAB "
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"template\": \"hShBhvAYM4Xd9mq5pceu\",\n    \"variables\": {\n        \"voice\": \"{{ $('Setting Parameters').item.json['Voice Name'] }}\",\n        \"voiceModel\": \"{{ $('Setting Parameters').item.json['Voice Model'] }}\",\n        \"imageModel\": \"{{ $('Setting Parameters').item.json['Image Model'] }}\",\n        \"subtitlesModel\": \"{{ $('Setting Parameters').item.json['Subtitles Model'] }}\",\n        \"scenes\": {{ JSON.stringify($json.message.content.scenes) }},\n        \"fontFamily\": \"{{ $('Setting Parameters').item.json['Subtitles Font'] }}\"\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -656,
+        416
+      ],
+      "id": "14700b59-7326-49a4-8839-0c9ad93e0eaf",
+      "name": "Submit a new job"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        368
+      ],
+      "id": "4a7953d2-4376-4d64-be86-93b21b9b0bd1",
+      "name": "Wait for 15 seconds",
+      "webhookId": "2c8145b5-9da2-4e3c-a51f-c8fb4828a6e1"
+    },
+    {
+      "parameters": {
+        "content": "## Generating script [voiceovertext, image prompts, etc]\n",
+        "height": 328,
+        "width": 252,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1008,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "04dcd2f4-fb1b-4e98-8100-cf5aac3e7988",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Get the topic of the video to be created",
+        "height": 328,
+        "width": 256,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1568,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "9414e83a-87a0-448d-a249-14620674e863",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Start the rendering job in JSON2Video",
+        "height": 328,
+        "width": 224,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -720,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "cca46069-649b-4ee1-91eb-934d42d03b0e",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## An error happened",
+        "height": 300,
+        "width": 256,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        464
+      ],
+      "typeVersion": 1,
+      "id": "e3ce5fbe-4fee-4333-890a-3cde4053f014",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Uploading Video\n",
+        "height": 272,
+        "width": 224,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "54d23569-63a9-4434-9ffe-851719bb2126",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('OpenAI').item.json.message.content.title }}",
+        "regionCode": "IN",
+        "categoryId": "28",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        608,
+        208
+      ],
+      "id": "75fad79d-f6fb-4b3a-8fb4-8a5f5f43a1f2",
+      "name": "Upload a video",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "Def35qVwPS0bwOzw",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.movie.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        352,
+        208
+      ],
+      "id": "b0438df5-d899-495b-a245-a88ac01d5321",
+      "name": "Get URL"
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=technology+news&hl=en-IN&gl=IN&ceid=IN:en",
+        "options": {}
+      },
+      "id": "c92772cc-fc6c-4315-9b7c-566bb11fe21b",
+      "name": "Get Google News Top Tech",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2336,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ec77faff-0035-4da1-b615-83d29c9fa667",
+      "name": "Parse RSS XML",
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -2048,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the JSON from the previous node (Parse RSS XML)\nconst root = $input.all()[0].json;\n\n// Try multiple possible shapes of the RSS JSON\nlet items;\n\n// Case 1: Typical structure: { rss: { channel: [ { item: [...] } ] } }\nif (root.rss && Array.isArray(root.rss.channel) && root.rss.channel[0]?.item) {\n  items = root.rss.channel[0].item;\n\n// Case 2: { rss: { channel: { item: [...] } } }\n} else if (root.rss && root.rss.channel && root.rss.channel.item) {\n  items = root.rss.channel.item;\n\n// Case 3: { channel: { item: [...] } }\n} else if (root.channel && root.channel.item) {\n  items = root.channel.item;\n\n// Case 4: { channel: [ { item: [...] } ] }\n} else if (Array.isArray(root.channel) && root.channel[0]?.item) {\n  items = root.channel[0].item;\n} else {\n  // Help debug if it still fails\n  throw new Error('No <item> elements found in the RSS feed. Root keys: ' + Object.keys(root).join(', '));\n}\n\n// Ensure items is an array and pick the first (top) article\nif (!Array.isArray(items)) {\n  items = [items];\n}\n\nconst topArticle = items[0];\n\n// Helper to safely pull first value from arrays/strings\nconst getFirst = (v) => {\n  if (Array.isArray(v)) return v[0] ?? '';\n  return v ?? '';\n};\n\nconst title = getFirst(topArticle.title);\nconst description = getFirst(topArticle.description);\n\nreturn [\n  {\n    json: {\n      title,\n      description,\n      articleText: `Title: ${title}\\nDescription: ${description}`\n    }\n  }\n];\n"
+      },
+      "id": "215126cb-1712-4b8c-b297-6e754de258c2",
+      "name": "Extract Top Article",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1776,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.articleText }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are helping to automate YouTube tech news video creation.\n\nYou receive today's top technology news article from Google News inside a variable called `articleText`.\n\nYour task:\n1. Read the article content.\n2. Create a short topic line for a YouTube tech news video.\n3. The topic MUST start with: \"Create a tech news video about ...\"\n4. Then output a SINGLE JSON object with the EXACT fields and exact constant values shown.\n\nIMPORTANT RULES:\n- DO NOT change any field names.\n- DO NOT change constant values.\n- ONLY the “Topic” value should change based on the article.\n- Output ONLY valid JSON. No text outside the JSON object.\n\nTHE OUTPUT MUST BE EXACTLY IN THIS FORMAT:\n{\n  \"id\": \"\",\n  \"createdTime\": \"\",\n  \"Status\": \"Todo\",\n  \"Topic\": \"Create a tech news video about <insert your generated topic>\",\n  \"Language\": \"English\",\n  \"Voice Name\": \"en-US-BrianMultilingualNeural\",\n  \"Voice Model\": \"azure\",\n  \"Image Model\": \"freepik-classic\",\n  \"Subtitles Model\": \"default\",\n  \"Subtitles Font\": \"Luckiest Guy\"\n}\nReplace ONLY the <insert your generated topic> part using the content from `articleText`.\nEverything else must remain exactly the same."
+        }
+      },
+      "id": "a9cd4e52-3a9e-4bfc-b4a0-e11235ab4dc9",
+      "name": "Gemini - Build Topic Record",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        416
+      ],
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "s7c895WeZWLCK7S0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2592,
+        416
+      ],
+      "id": "2f1912cd-16dd-41cb-b64f-b284f134bc96",
+      "name": "Telegram Trigger",
+      "webhookId": "c4a68c07-641d-46a7-b112-73a257b8c561",
+      "credentials": {
+        "telegramApi": {
+          "id": "iBlGQf416IW8NP3V",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Video Uploaded with url: {{ $('Get URL').item.json.movie.url }} with upload id: {{ $json.uploadId }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        864,
+        208
+      ],
+      "id": "e96e7a11-62cf-4e34-b38a-dde760209bc2",
+      "name": "Send a text message",
+      "webhookId": "6e275379-75ca-4233-a560-a4f5edf2d9d2",
+      "credentials": {
+        "telegramApi": {
+          "id": "iBlGQf416IW8NP3V",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Update through telegram\n",
+        "height": 268,
+        "width": 224,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        800,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "eff3b1af-126b-4cd5-b8f6-f330cd9d328c",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Trigger or Start the workflow through message\n",
+        "height": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2656,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "1c6ead1d-7a7d-4204-8d5f-45ca7c9ae5ca",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Getting news from google news",
+        "height": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2384,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "ec8c9b6f-923e-43d6-bdf8-3f53f13eca20",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "##  Parseing the content\n",
+        "height": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2112,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "8925fe91-9c8e-4e7c-b962-941fb45d84a0",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Selecting top news\n",
+        "height": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1840,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "d77dfe25-a8fd-4482-b555-2bd7c040071e",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the raw Gemini response JSON for this item\nconst item = $input.all()[0].json;\n\n// 1. Extract the JSON string from content.parts[0].text\nconst rawText = item.content.parts[0].text;\n\n// 2. Parse it into a real object\nconst parsed = JSON.parse(rawText);\n\n// 3. Return it as the new item JSON so next nodes see flat fields:\n//    id, createdTime, Status, Topic, Language, Voice Name, ...\nreturn [\n  {\n    json: parsed\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1216,
+        416
+      ],
+      "id": "50382df6-324e-46d3-af22-c48d05ec5f00",
+      "name": "Setting Parameters"
+    },
+    {
+      "parameters": {
+        "content": "## Extracting parameters from gemini node",
+        "height": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "351e6b87-b367-4156-a8cd-6b8a8d44d850",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Getting links\n",
+        "height": 272,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        272,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "398facc2-6cf5-404a-b648-656b2e009fc2",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Submit a new job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for 15 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check status": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit a new job": {
+      "main": [
+        [
+          {
+            "node": "Wait for 15 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for 15 seconds": {
+      "main": [
+        [
+          {
+            "node": "Check status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get URL": {
+      "main": [
+        [
+          {
+            "node": "Upload a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Google News Top Tech": {
+      "main": [
+        [
+          {
+            "node": "Parse RSS XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse RSS XML": {
+      "main": [
+        [
+          {
+            "node": "Extract Top Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Top Article": {
+      "main": [
+        [
+          {
+            "node": "Gemini - Build Topic Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini - Build Topic Record": {
+      "main": [
+        [
+          {
+            "node": "Setting Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Google News Top Tech",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a video": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setting Parameters": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "26cf7065-0283-4247-93f7-0c9e9a816caa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab8332a8a3cf3213dcf55c76b69bd1779cb1a3b06998fcf436cf850a2da06002"
+  },
+  "id": "IltAZm9k0Kn0CsyR",
+  "tags": []
+}

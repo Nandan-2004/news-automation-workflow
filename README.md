@@ -24,7 +24,7 @@ The workflow takes a single trigger (Telegram or manual run), retrieves the late
 
 The workflow structure is shown in the image below:
 
-![Workflow Diagram](assets/workflow.png)
+![Workflow Diagram](workflow.png)
 
 ---
 
